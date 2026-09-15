@@ -125,6 +125,7 @@ func provideCleanup(
 	upstreamBillingProbe *service.UpstreamBillingProbeService,
 	ollamaCloudUsage *service.OllamaCloudUsageService,
 	auditLog *service.AuditLogService,
+	codexTranscript *service.CodexTranscriptService,
 	openAIAutoReset *service.OpenAIQuotaAutoResetService,
 	promptAudit *securityaudit.PromptService,
 	pluginManager *service.PluginManager,
@@ -203,6 +204,12 @@ func provideCleanup(
 			{"AuditLogService", func() error {
 				if auditLog != nil {
 					auditLog.Stop()
+				}
+				return nil
+			}},
+			{"CodexTranscriptService", func() error {
+				if codexTranscript != nil {
+					codexTranscript.Stop()
 				}
 				return nil
 			}},

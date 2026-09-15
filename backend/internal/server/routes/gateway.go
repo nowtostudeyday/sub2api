@@ -36,6 +36,11 @@ func RegisterGatewayRoutes(
 	endpointNorm := handler.InboundEndpointMiddleware()
 	compositeTarget := compositeTargetPlatformMiddleware(compositeResolver)
 	compositeGeminiTarget := compositeGeminiTargetPlatformMiddleware(compositeResolver)
+	// Codex 对话留痕：包一层 ResponseWriter 即可覆盖全部 HTTP 转发路径
+	// （常规/透传、流式/非流式）。默认关闭时不包装，零成本。
+	// 仅挂在 /responses 系列路由上；GET /responses（WebSocket 升级）不经过
+	// gin.ResponseWriter，是已知盲区。
+	codexTranscript := h.OpenAIGateway.CodexTranscriptMiddleware()
 
 	// 未分组 Key 拦截中间件（按协议格式区分错误响应）
 	requireGroupAnthropic := middleware.RequireGroupAssignment(settingService, middleware.AnthropicErrorWriter)
@@ -215,14 +220,14 @@ func RegisterGatewayRoutes(
 		gateway.POST("/live", h.OpenAIGateway.Live)
 		gateway.GET("/live/:call_id", h.OpenAIGateway.LiveSideband)
 		// OpenAI Responses API: auto-route based on group platform
-		gateway.POST("/responses", func(c *gin.Context) {
+		gateway.POST("/responses", codexTranscript, func(c *gin.Context) {
 			if isOpenAIResponsesCompatibleGatewayPlatform(c) {
 				h.OpenAIGateway.Responses(c)
 				return
 			}
 			h.Gateway.Responses(c)
 		})
-		gateway.POST("/responses/*subpath", guardResponsesSubpath(func(c *gin.Context) {
+		gateway.POST("/responses/*subpath", codexTranscript, guardResponsesSubpath(func(c *gin.Context) {
 			if isOpenAIResponsesCompatibleGatewayPlatform(c) {
 				h.OpenAIGateway.Responses(c)
 				return
@@ -365,11 +370,11 @@ func RegisterGatewayRoutes(
 	}
 	// 根路径别名共用中间件链：白名单准入在 apiKeyAuth 之后、compositeTarget
 	// 之前，避免逐条路由手工维护链导致漏挂。
-	rootRoute := func(method, path string, limit gin.HandlerFunc, handler gin.HandlerFunc) {
-		r.Handle(method, path, limit, clientRequestID, opsErrorLogger, endpointNorm, gin.HandlerFunc(apiKeyAuth), groupModelAllowlist, compositeTarget, requireGroupAnthropic, handler)
+	rootRoute := func(method, path string, limit gin.HandlerFunc, handlers ...gin.HandlerFunc) {
+		r.Handle(method, path, append([]gin.HandlerFunc{limit, clientRequestID, opsErrorLogger, endpointNorm, gin.HandlerFunc(apiKeyAuth), groupModelAllowlist, compositeTarget, requireGroupAnthropic}, handlers...)...)
 	}
-	rootRoute(http.MethodPost, "/responses", bodyLimit, responsesHandler)
-	rootRoute(http.MethodPost, "/responses/*subpath", bodyLimit, guardResponsesSubpath(responsesHandler))
+	rootRoute(http.MethodPost, "/responses", bodyLimit, codexTranscript, responsesHandler)
+	rootRoute(http.MethodPost, "/responses/*subpath", bodyLimit, codexTranscript, guardResponsesSubpath(responsesHandler))
 	rootRoute(http.MethodPost, "/alpha/search", textBodyLimit, h.OpenAIGateway.AlphaSearch)
 	rootRoute(http.MethodGet, "/responses", bodyLimit, func(c *gin.Context) {
 		h.OpenAIGateway.ResponsesWebSocket(c)
@@ -382,8 +387,8 @@ func RegisterGatewayRoutes(
 	{
 		codexDirect.POST("/realtime/calls", h.OpenAIGateway.Live)
 		codexDirect.GET("/:call_id", h.OpenAIGateway.LiveSideband)
-		codexDirect.POST("/responses", responsesHandler)
-		codexDirect.POST("/responses/*subpath", guardResponsesSubpath(responsesHandler))
+		codexDirect.POST("/responses", codexTranscript, responsesHandler)
+		codexDirect.POST("/responses/*subpath", codexTranscript, guardResponsesSubpath(responsesHandler))
 		codexDirect.POST("/alpha/search", textBodyLimit, h.OpenAIGateway.AlphaSearch)
 		codexDirect.GET("/responses", func(c *gin.Context) {
 			h.OpenAIGateway.ResponsesWebSocket(c)

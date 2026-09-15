@@ -42,6 +42,7 @@ type OpenAIGatewayHandler struct {
 	contentModerationService   *service.ContentModerationService
 	securityAuditCoordinator   *securityaudit.Coordinator
 	grokMediaEligibilityProber grokMediaEligibilityProber
+	codexTranscriptService     *service.CodexTranscriptService
 	opsService                 *service.OpsService
 	concurrencyHelper          *ConcurrencyHelper
 	imageLimiter               *imageConcurrencyLimiter
@@ -451,6 +452,11 @@ func (h *OpenAIGatewayHandler) Responses(c *gin.Context) {
 		h.errorResponse(c, http.StatusBadRequest, "invalid_request_error", "Failed to parse request body")
 		return
 	}
+
+	// 抽取本轮对话增量暂存到 context，由 CodexTranscriptMiddleware 在响应结束时组装落库。
+	// 放在这里是因为 body 已在内存且校验通过，抽取零额外读取；且位置早于透传路径补写
+	// instructions，拿到的是客户端原文。
+	stashCodexTranscriptRequest(c, h.codexTranscriptService, body)
 
 	// 使用 gjson 只读提取字段做校验，避免完整 Unmarshal
 	modelResult := gjson.GetBytes(body, "model")

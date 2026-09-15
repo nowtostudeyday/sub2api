@@ -700,6 +700,8 @@ func registerUsageRoutes(admin *gin.RouterGroup, h *handler.Handlers) {
 		usage.GET("/cleanup-tasks", h.Admin.Usage.ListCleanupTasks)
 		usage.POST("/cleanup-tasks", h.Admin.Usage.CreateCleanupTask)
 		usage.POST("/cleanup-tasks/:id/cancel", h.Admin.Usage.CancelCleanupTask)
+		// 按 request_id 反查该轮 Codex 对话的输入/输出原文（列表不带原文，点击才拉）
+		usage.GET("/transcript", h.Admin.CodexTranscript.GetByRequestID)
 	}
 }
 

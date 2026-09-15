@@ -579,6 +579,14 @@ func ProvideAuditLogService(repo AuditLogRepository, settingService *SettingServ
 	return svc
 }
 
+// ProvideCodexTranscriptService 创建 Codex 对话留痕服务并启动异步写入与保留期清理协程。
+// 停止逻辑挂在 cmd/server 的 provideCleanup。
+func ProvideCodexTranscriptService(repo CodexTranscriptRepository, settingService *SettingService) *CodexTranscriptService {
+	svc := NewCodexTranscriptService(repo, settingService)
+	svc.Start()
+	return svc
+}
+
 func buildIdempotencyConfig(cfg *config.Config) IdempotencyConfig {
 	idempotencyCfg := DefaultIdempotencyConfig()
 	if cfg != nil {
@@ -887,6 +895,7 @@ var ProviderSet = wire.NewSet(
 	ProvideOpsService,
 	ProvideOpsIngressRejectAggregator,
 	ProvideAuditLogService,
+	ProvideCodexTranscriptService,
 	ProvideOpsMetricsCollector,
 	ProvideOpsAggregationService,
 	ProvideOpsAlertEvaluatorService,

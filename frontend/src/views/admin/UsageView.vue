@@ -134,6 +134,7 @@
             @sort="handleSort"
             @userClick="handleUserClick"
             @ipGeoBatchFailed="handleIpGeoBatchFailed"
+            @transcriptClick="handleTranscriptClick"
           />
           <Pagination v-if="pagination.total > 0" :page="pagination.page" :total="pagination.total" :page-size="pagination.page_size" @update:page="handlePageChange" @update:pageSize="handlePageSizeChange" />
         </div>
@@ -181,6 +182,12 @@
     :hide-actions="true"
     @close="showBalanceHistoryModal = false; balanceHistoryUser = null"
   />
+  <!-- Codex 对话原文：列表不带原文，点击某行才按 request_id 拉取 -->
+  <CodexTranscriptDialog
+    :show="transcriptDialogVisible"
+    :request-id="transcriptRequestId"
+    @close="transcriptDialogVisible = false"
+  />
 </template>
 
 <script setup lang="ts">
@@ -197,6 +204,7 @@ import UsageStatsCards from '@/components/admin/usage/UsageStatsCards.vue'; impo
 import UsageTable from '@/components/admin/usage/UsageTable.vue'; import UsageExportProgress from '@/components/admin/usage/UsageExportProgress.vue'
 import UserTokenRanking from '@/components/admin/usage/UserTokenRanking.vue'
 import UsageCleanupDialog from '@/components/admin/usage/UsageCleanupDialog.vue'
+import CodexTranscriptDialog from '@/components/admin/usage/CodexTranscriptDialog.vue'
 import UserBalanceHistoryModal from '@/components/admin/user/UserBalanceHistoryModal.vue'
 import OpsErrorLogTable from '@/views/admin/ops/components/OpsErrorLogTable.vue'
 import OpsErrorDetailModal from '@/views/admin/ops/components/OpsErrorDetailModal.vue'
@@ -238,6 +246,14 @@ const cleanupDialogVisible = ref(false)
 // Balance history modal state
 const showBalanceHistoryModal = ref(false)
 const balanceHistoryUser = ref<AdminUser | null>(null)
+// Codex 对话原文弹窗
+const transcriptDialogVisible = ref(false)
+const transcriptRequestId = ref('')
+
+const handleTranscriptClick = (requestId: string) => {
+  transcriptRequestId.value = requestId
+  transcriptDialogVisible.value = true
+}
 
 const breakdownFilters = computed(() => {
   const f: Record<string, any> = {}
@@ -654,7 +670,8 @@ const allColumns = computed(() => [
   { key: 'request_id', label: t('admin.usage.requestId'), sortable: false },
   { key: 'upstream_request_id', label: t('admin.usage.upstreamRequestId'), sortable: false },
   { key: 'user_agent', label: t('usage.userAgent'), sortable: false },
-  { key: 'ip_address', label: t('admin.usage.ipAddress'), sortable: false }
+  { key: 'ip_address', label: t('admin.usage.ipAddress'), sortable: false },
+  { key: 'transcript', label: t('admin.usage.transcript.column'), sortable: false }
 ])
 
 const hiddenColumns = reactive<Set<string>>(new Set())

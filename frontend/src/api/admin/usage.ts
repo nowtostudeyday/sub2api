@@ -207,6 +207,46 @@ export async function cancelCleanupTask(taskId: number): Promise<{ id: number; s
   return data
 }
 
+/**
+ * Codex conversation transcript for a single usage log row
+ */
+export interface CodexTranscript {
+  id: number
+  created_at: string
+  request_id: string
+  api_key_id: number
+  user_id: number
+  session_id: string
+  model: string
+  turn_kind: string
+  instructions_full: string
+  instructions_hash: string
+  user_input: string
+  user_input_truncated: boolean
+  tool_output: string
+  tool_output_truncated: boolean
+  output_text: string
+  output_truncated: boolean
+  output_reasoning: string
+}
+
+/**
+ * Fetch the Codex conversation transcript for one usage log entry (admin only).
+ * The usage list intentionally omits raw text; it is loaded on demand per row.
+ * @param requestId - The usage log's request_id
+ * @returns Transcript record for that turn
+ */
+export async function getCodexTranscript(
+  requestId: string,
+  options?: { signal?: AbortSignal }
+): Promise<CodexTranscript> {
+  const { data } = await apiClient.get<CodexTranscript>('/admin/usage/transcript', {
+    params: { request_id: requestId },
+    signal: options?.signal
+  })
+  return data
+}
+
 export const adminUsageAPI = {
   list,
   getStats,
@@ -214,7 +254,8 @@ export const adminUsageAPI = {
   searchApiKeys,
   listCleanupTasks,
   createCleanupTask,
-  cancelCleanupTask
+  cancelCleanupTask,
+  getCodexTranscript
 }
 
 export default adminUsageAPI

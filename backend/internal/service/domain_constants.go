@@ -297,6 +297,10 @@ const (
 	// 操作审计日志设置
 	SettingKeyAuditLogRetentionDays = "audit_log_retention_days" // 审计日志保留天数（<=0 永久保留），默认 180
 
+	// Codex 对话留痕设置
+	SettingKeyCodexTranscriptEnabled       = "codex_transcript_enabled"        // 是否记录 Codex 每轮输入/输出原文，默认关闭
+	SettingKeyCodexTranscriptRetentionDays = "codex_transcript_retention_days" // 对话留痕保留天数（<=0 永久保留），默认 5
+
 	// LinuxDo Connect OAuth 登录设置
 	SettingKeyLinuxDoConnectEnabled      = "linuxdo_connect_enabled"
 	SettingKeyLinuxDoConnectClientID     = "linuxdo_connect_client_id"

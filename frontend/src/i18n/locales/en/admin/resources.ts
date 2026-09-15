@@ -524,6 +524,28 @@ export default {
       upstreamRequestId: 'Upstream ID',
       requestIdCopied: 'Request ID copied',
       upstreamRequestIdCopied: 'Upstream ID copied',
+      transcript: {
+        column: 'Conversation',
+        view: 'View',
+        title: 'Codex Conversation',
+        model: 'Model',
+        turnKind: 'Turn type',
+        createdAt: 'Time',
+        userInput: 'User input',
+        output: 'Model output',
+        reasoning: 'Reasoning',
+        toolOutput: 'Tool output',
+        instructions: 'System instructions',
+        instructionsOmitted: 'Instructions match the first turn of this session and were not stored again',
+        truncated: '(truncated)',
+        notFound: 'No transcript for this request (feature may be disabled or the record expired)',
+        kinds: {
+          user: 'User turn',
+          tool: 'Tool chain',
+          mixed: 'Mixed',
+          unknown: 'Unknown'
+        }
+      },
       allModels: 'All Models',
       allAccounts: 'All Accounts',
       allGroups: 'All Groups',

@@ -521,6 +521,28 @@ export default {
       upstreamRequestId: '上游ID',
       requestIdCopied: '请求ID已复制',
       upstreamRequestIdCopied: '上游ID已复制',
+      transcript: {
+        column: '对话',
+        view: '查看对话',
+        title: 'Codex 对话原文',
+        model: '模型',
+        turnKind: '轮次类型',
+        createdAt: '时间',
+        userInput: '用户输入',
+        output: '模型输出',
+        reasoning: '思考过程',
+        toolOutput: '工具结果',
+        instructions: '系统提示词',
+        instructionsOmitted: '系统提示词与本会话首轮一致，未重复保存',
+        truncated: '（已截断）',
+        notFound: '该请求没有对话留痕记录（可能功能未开启或已超过保留期）',
+        kinds: {
+          user: '用户提问',
+          tool: '工具续链',
+          mixed: '混合',
+          unknown: '未知'
+        }
+      },
       allModels: '全部模型',
       allAccounts: '全部账户',
       allGroups: '全部分组',

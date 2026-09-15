@@ -287,6 +287,46 @@ func parseAuditLogRetentionDays(value string) int {
 	return n
 }
 
+// defaultCodexTranscriptRetentionDays Codex 对话留痕默认保留天数。
+const defaultCodexTranscriptRetentionDays = 5
+
+// IsCodexTranscriptEnabled 是否记录 Codex 每轮输入/输出原文。
+//
+// 存储对话原文属敏感行为，读取失败一律视为关闭（fail-closed）。热路径的开关判定由
+// CodexTranscriptService 的短 TTL 快照承担，这里不做缓存。
+func (s *SettingService) IsCodexTranscriptEnabled(ctx context.Context) bool {
+	value, err := s.settingRepo.GetValue(ctx, SettingKeyCodexTranscriptEnabled)
+	if err != nil {
+		return false
+	}
+	return value == "true"
+}
+
+// GetCodexTranscriptRetentionDays 对话留痕保留天数（<=0 表示永久保留）。
+func (s *SettingService) GetCodexTranscriptRetentionDays(ctx context.Context) int {
+	value, err := s.settingRepo.GetValue(ctx, SettingKeyCodexTranscriptRetentionDays)
+	if err != nil {
+		return defaultCodexTranscriptRetentionDays
+	}
+	return parseCodexTranscriptRetentionDays(value)
+}
+
+// parseCodexTranscriptRetentionDays 解析保留天数配置，空/非法值回退默认值。
+func parseCodexTranscriptRetentionDays(value string) int {
+	value = strings.TrimSpace(value)
+	if value == "" {
+		return defaultCodexTranscriptRetentionDays
+	}
+	n, err := strconv.Atoi(value)
+	if err != nil {
+		return defaultCodexTranscriptRetentionDays
+	}
+	if n < 0 {
+		return 0
+	}
+	return n
+}
+
 // GetSiteName 获取网站名称
 func (s *SettingService) GetSiteName(ctx context.Context) string {
 	value, err := s.settingRepo.GetValue(ctx, SettingKeySiteName)

@@ -69,7 +69,8 @@ func TestGatewayRoutesGroupModelAllowlistMountedOnEveryGatewayRoute(t *testing.T
 	source := string(routeSource)
 
 	// rootRoute helper：apiKeyAuth 之后、compositeTarget 之前。
-	rootHelper := regexp.MustCompile(regexp.QuoteMeta(`r.Handle(method, path, limit, clientRequestID, opsErrorLogger, endpointNorm, gin.HandlerFunc(apiKeyAuth), groupModelAllowlist, compositeTarget, requireGroupAnthropic, handler)`))
+	// helper 接受变长 handlers（可在链尾追加路由级中间件），固定链段必须保持此顺序。
+	rootHelper := regexp.MustCompile(regexp.QuoteMeta(`r.Handle(method, path, append([]gin.HandlerFunc{limit, clientRequestID, opsErrorLogger, endpointNorm, gin.HandlerFunc(apiKeyAuth), groupModelAllowlist, compositeTarget, requireGroupAnthropic}, handlers...)...)`))
 	require.Regexp(t, rootHelper, source,
 		"root alias helper must place the allowlist between apiKeyAuth and compositeTarget")
 

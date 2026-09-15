@@ -43,6 +43,7 @@ func ProvideAdminHandlers(
 	channelMonitorTemplateHandler *admin.ChannelMonitorRequestTemplateHandler,
 	contentModerationHandler *admin.ContentModerationHandler,
 	promptAuditHandler *securityaudit.PromptAdminHandler,
+	codexTranscriptHandler *admin.CodexTranscriptHandler,
 	paymentHandler *admin.PaymentHandler,
 	affiliateHandler *admin.AffiliateHandler,
 	complianceHandler *admin.ComplianceHandler,
@@ -85,6 +86,7 @@ func ProvideAdminHandlers(
 		ChannelMonitorTemplate: channelMonitorTemplateHandler,
 		ContentModeration:      contentModerationHandler,
 		PromptAudit:            promptAuditHandler,
+		CodexTranscript:        codexTranscriptHandler,
 		Payment:                paymentHandler,
 		Affiliate:              affiliateHandler,
 		Compliance:             complianceHandler,
@@ -130,12 +132,14 @@ func ProvideOpenAIGatewayHandler(
 	grokQuotaService *service.GrokQuotaService,
 	cfg *config.Config,
 	coordinator *securityaudit.Coordinator,
+	codexTranscriptService *service.CodexTranscriptService,
 ) *OpenAIGatewayHandler {
 	gatewayService.SetPluginManager(pluginManager)
 	h := NewOpenAIGatewayHandler(gatewayService, concurrencyService, billingCacheService, apiKeyService,
 		usageRecordWorkerPool, errorPassthroughService, contentModerationService, opsService, cfg)
 	h.securityAuditCoordinator = coordinator
 	h.grokMediaEligibilityProber = grokQuotaService
+	h.codexTranscriptService = codexTranscriptService
 	return h
 }
 
@@ -279,6 +283,7 @@ var ProviderSet = wire.NewSet(
 	admin.NewChannelMonitorHandler,
 	admin.NewChannelMonitorRequestTemplateHandler,
 	admin.NewContentModerationHandler,
+	admin.NewCodexTranscriptHandler,
 	admin.NewPaymentHandler,
 	admin.NewAffiliateHandler,
 	admin.NewComplianceHandler,

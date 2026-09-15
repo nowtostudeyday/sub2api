@@ -304,6 +304,18 @@
           <span v-else class="text-sm text-gray-400 dark:text-gray-500">-</span>
         </template>
 
+        <template #cell-transcript="{ row }">
+          <button
+            v-if="row.request_id"
+            type="button"
+            class="text-sm font-medium text-primary-600 transition-colors hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
+            @click="emit('transcriptClick', row.request_id)"
+          >
+            {{ t('admin.usage.transcript.view') }}
+          </button>
+          <span v-else class="text-sm text-gray-400 dark:text-gray-500">-</span>
+        </template>
+
         <template #empty><EmptyState :message="t('usage.noRecords')" /></template>
       </DataTable>
     </div>
@@ -612,6 +624,7 @@ const emit = defineEmits<{
   userClick: [userID: number, email?: string]
   sort: [key: string, order: 'asc' | 'desc']
   ipGeoBatchFailed: []
+  transcriptClick: [requestId: string]
 }>()
 const { t } = useI18n()
 const appStore = useAppStore()
