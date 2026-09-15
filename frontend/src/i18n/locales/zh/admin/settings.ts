@@ -1001,6 +1001,14 @@ export default {
         securityWarning: '警告：此密钥拥有完整的管理员权限，请妥善保管。',
         usage: '使用方法：在请求头中添加 x-api-key: <your-admin-api-key>'
       },
+      codexTranscript: {
+        title: 'Codex 对话留痕',
+        description: '记录每轮 Codex 对话的用户输入与模型输出原文，可在使用记录页逐条查看',
+        enabled: '启用对话留痕',
+        enabledHint: '默认关闭。开启后只存本轮增量（不重复保存历史），工具结果单独存放；改动约 1 秒后生效，无需重启',
+        retention: '保留天数',
+        retentionHint: '超过天数的记录每日自动清理；0 表示永久保留（对话原文体积较大，不建议长期保留）'
+      },
       overloadCooldown: {
         title: '529 过载冷却',
         description: '配置上游返回 529（过载）时的账号调度暂停策略',

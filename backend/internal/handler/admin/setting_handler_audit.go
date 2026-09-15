@@ -68,6 +68,13 @@ func diffSettings(before *service.SystemSettings, after *service.SystemSettings,
 	if before.StepUpEnabled != after.StepUpEnabled {
 		changed = append(changed, "step_up_enabled")
 	}
+	// 开关对话原文留痕属敏感操作，必须进操作审计。
+	if before.CodexTranscriptEnabled != after.CodexTranscriptEnabled {
+		changed = append(changed, "codex_transcript_enabled")
+	}
+	if before.CodexTranscriptRetentionDays != after.CodexTranscriptRetentionDays {
+		changed = append(changed, "codex_transcript_retention_days")
+	}
 	if before.LoginAgreementEnabled != after.LoginAgreementEnabled {
 		changed = append(changed, "login_agreement_enabled")
 	}

@@ -25,6 +25,8 @@ type SystemSettings struct {
 	SessionBindingEnabled               bool // 会话 IP/UA 绑定（变更即失效）
 	StepUpEnabled                       bool // 敏感操作 step-up 2FA 门控
 	AuditLogRetentionDays               int  // 审计日志保留天数（<=0 永久保留）
+	CodexTranscriptEnabled              bool // Codex 对话留痕（记录每轮输入/输出原文）
+	CodexTranscriptRetentionDays        int  // 对话留痕保留天数（<=0 永久保留）
 	LoginAgreementEnabled               bool
 	LoginAgreementMode                  string
 	LoginAgreementUpdatedAt             string

@@ -1007,6 +1007,14 @@ export default {
         securityWarning: 'Warning: This key provides full admin access. Keep it secure.',
         usage: 'Usage: Add to request header - x-api-key: <your-admin-api-key>'
       },
+      codexTranscript: {
+        title: 'Codex Conversation Transcript',
+        description: 'Record the user input and model output of every Codex turn; view per row on the usage page',
+        enabled: 'Enable transcript',
+        enabledHint: 'Off by default. Stores only the delta of each turn (history is not duplicated) with tool results kept separately; takes effect within ~1s, no restart needed',
+        retention: 'Retention days',
+        retentionHint: 'Records older than this are purged daily; 0 keeps them forever (transcripts are large, long retention is not recommended)'
+      },
       overloadCooldown: {
         title: '529 Overload Cooldown',
         description: 'Configure account scheduling pause strategy when upstream returns 529 (overloaded)',
