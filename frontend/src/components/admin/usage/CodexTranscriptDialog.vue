@@ -75,10 +75,10 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import dayjs from 'dayjs'
 
 import BaseDialog from '@/components/common/BaseDialog.vue'
 import { adminUsageAPI, type CodexTranscript } from '@/api/admin/usage'
+import { formatDateTime } from '@/utils/format'
 
 const props = defineProps<{ show: boolean; requestId: string }>()
 const emit = defineEmits<{ (e: 'close'): void }>()
@@ -90,7 +90,7 @@ const loading = ref(false)
 const errorMessage = ref('')
 
 const formattedCreatedAt = computed(() =>
-  transcript.value ? dayjs(transcript.value.created_at).format('YYYY-MM-DD HH:mm:ss') : '—'
+  transcript.value ? formatDateTime(transcript.value.created_at) : '—'
 )
 
 const turnKindLabel = computed(() => {
